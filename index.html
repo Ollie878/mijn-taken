@@ -16,6 +16,7 @@
   --laag:#3A7A3A; --laag-bg:#EDF5ED;
   --werk:#1A4A8A; --werk-bg:#EBF0FA;
   --priv:#5A3A8A; --priv-bg:#F2EEF9;
+  --bezig:#1A6A6A; --bezig-bg:#E1F5EE;
   --r:14px; --rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -62,8 +63,10 @@ main{padding:14px 16px}
 .task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:7px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none;transition:opacity .2s,transform .12s}
 .task-card:active{transform:scale(0.985)}
 .task-card.done{opacity:.38}
+.task-card.bezig{border-left:3px solid var(--bezig)}
 .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;transition:all .15s}
 .task-card.done .chk{background:var(--text);border-color:var(--text)}
+.task-card.bezig .chk{background:var(--bezig);border-color:var(--bezig)}
 .tbody{flex:1;min-width:0}
 .ttext{font-size:15px;line-height:1.4;color:var(--text);margin-bottom:6px;word-break:break-word}
 .task-card.done .ttext{text-decoration:line-through;color:var(--text3)}
@@ -74,6 +77,7 @@ main{padding:14px 16px}
 .t-laag{background:var(--laag-bg);color:var(--laag)}
 .t-werk{background:var(--werk-bg);color:var(--werk)}
 .t-priv{background:var(--priv-bg);color:var(--priv)}
+.t-bezig{background:var(--bezig-bg);color:var(--bezig)}
 .tdel{width:30px;height:30px;border-radius:50%;background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:-3px -5px 0 0;transition:color .15s}
 .tdel:active{color:var(--hoog)}
 .empty{text-align:center;padding:48px 16px;color:var(--text3);font-size:14px}
@@ -141,6 +145,7 @@ main{padding:14px 16px}
       <button class="fb" onclick="setF('privé',this)">Privé</button>
       <button class="fb" onclick="setF('hoog',this)">Hoog</button>
       <button class="fb" onclick="setF('todo',this)">Te doen</button>
+      <button class="fb" onclick="setF('bezig',this)">Bezig</button>
       <button class="fb" onclick="setF('done',this)">Gedaan</button>
     </div>
   </header>
@@ -305,12 +310,16 @@ function addTask(){
   const inp=document.getElementById('taskInp');
   const text=inp.value.trim();
   if(!text) return;
-  tasks.unshift({id:Date.now(),text,prio,cat,done:false});
+  tasks.unshift({id:Date.now(),text,prio,cat,status:'todo'});
   inp.value=''; render(); debounceSave();
 }
 function toggle(id){
   const t=tasks.find(x=>x.id===id);
-  if(t){t.done=!t.done;render();debounceSave();}
+  if(!t) return;
+  if(t.status==='todo') t.status='bezig';
+  else if(t.status==='bezig') t.status='done';
+  else t.status='todo';
+  render(); debounceSave();
 }
 function del(id,e){
   e.stopPropagation();
@@ -324,32 +333,41 @@ function render(){
   if(filter==='werk') list=tasks.filter(t=>t.cat==='werk');
   else if(filter==='privé') list=tasks.filter(t=>t.cat==='privé');
   else if(filter==='hoog') list=tasks.filter(t=>t.prio==='hoog');
-  else if(filter==='todo') list=tasks.filter(t=>!t.done);
-  else if(filter==='done') list=tasks.filter(t=>t.done);
+  else if(filter==='todo') list=tasks.filter(t=>t.status==='todo'||(!t.status&&!t.done));
+  else if(filter==='bezig') list=tasks.filter(t=>t.status==='bezig');
+  else if(filter==='done') list=tasks.filter(t=>t.status==='done'||(t.done&&!t.status));
 
-  const todo=list.filter(t=>!t.done);
-  const done=list.filter(t=>t.done);
+  const getStatus=t=>t.status||(t.done?'done':'todo');
+  const todo=list.filter(t=>getStatus(t)==='todo');
+  const bezig=list.filter(t=>getStatus(t)==='bezig');
+  const done=list.filter(t=>getStatus(t)==='done');
   const el=document.getElementById('taskList');
 
   if(!list.length){el.innerHTML='<div class="empty">Geen taken gevonden</div>';return;}
 
   const pLabels={hoog:'Hoog',mid:'Midden',laag:'Laag'};
   const pTag={hoog:'t-hoog',mid:'t-mid',laag:'t-laag'};
+  const statusIcon={todo:'',bezig:'›',done:'✓'};
 
-  const cardHTML=t=>`<div class="task-card${t.done?' done':''}" onclick="toggle(${t.id})">
-    <div class="chk">${t.done?'✓':''}</div>
-    <div class="tbody">
-      <div class="ttext">${t.text}</div>
-      <div class="tags">
-        <span class="tag ${pTag[t.prio]||'t-mid'}">${pLabels[t.prio]||'Midden'}</span>
-        <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
+  const cardHTML=t=>{
+    const st=getStatus(t);
+    return`<div class="task-card ${st}" onclick="toggle(${t.id})">
+      <div class="chk">${statusIcon[st]||''}</div>
+      <div class="tbody">
+        <div class="ttext">${t.text}</div>
+        <div class="tags">
+          <span class="tag ${pTag[t.prio]||'t-mid'}">${pLabels[t.prio]||'Midden'}</span>
+          <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
+          ${st==='bezig'?'<span class="tag t-bezig">Bezig</span>':''}
+        </div>
       </div>
-    </div>
-    <button class="tdel" onclick="del(${t.id},event)">×</button>
-  </div>`;
+      <button class="tdel" onclick="del(${t.id},event)">×</button>
+    </div>`;
+  };
 
   let html='';
   if(todo.length) html+='<div class="sec-lbl">Te doen — '+todo.length+'</div>'+todo.map(cardHTML).join('');
+  if(bezig.length) html+='<div class="sec-lbl">Bezig — '+bezig.length+'</div>'+bezig.map(cardHTML).join('');
   if(done.length) html+='<div class="sec-lbl">Gedaan — '+done.length+'</div>'+done.map(cardHTML).join('');
   el.innerHTML=html;
 }
