@@ -8,25 +8,21 @@
 <title>Mijn Taken</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#F5F3EE; --surface:#FFF; --surface2:#EDEAE3; --border:#D8D4CA;
-  --text:#1A1814; --text2:#7A7570; --text3:#B0ABA4;
-  --hoog:#C4391A; --hoog-bg:#FDF0EC;
-  --mid:#C47A00;  --mid-bg:#FDF5E6;
-  --laag:#3A7A3A; --laag-bg:#EDF5ED;
-  --werk:#1A4A8A; --werk-bg:#EBF0FA;
-  --priv:#5A3A8A; --priv-bg:#F2EEF9;
-  --bezig:#1A6A6A; --bezig-bg:#E1F5EE;
-  --r:14px; --rs:8px;
+:root{
+  --bg:#F5F3EE;--surface:#FFF;--surface2:#EDEAE3;--border:#D8D4CA;
+  --text:#1A1814;--text2:#7A7570;--text3:#B0ABA4;
+  --hoog:#C4391A;--hoog-bg:#FDF0EC;
+  --mid:#C47A00;--mid-bg:#FDF5E6;
+  --laag:#3A7A3A;--laag-bg:#EDF5ED;
+  --werk:#1A4A8A;--werk-bg:#EBF0FA;
+  --priv:#5A3A8A;--priv-bg:#F2EEF9;
+  --bezig:#1A6A6A;--bezig-bg:#E1F5EE;
+  --r:14px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:20px}
-
-/* SCREENS */
-.screen{display:none;padding:24px 20px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:24px}
+.screen{display:none;padding:28px 20px}
 .screen.active{display:block}
-
-/* SETUP */
 .setup-icon{font-size:48px;text-align:center;margin-bottom:16px}
 h1{font-size:22px;font-weight:600;letter-spacing:-.4px;margin-bottom:8px}
 .sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
@@ -36,17 +32,17 @@ h1{font-size:22px;font-weight:600;letter-spacing:-.4px;margin-bottom:8px}
 .step a{color:var(--werk);text-decoration:none;font-weight:500}
 .step code{font-family:'DM Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--text)}
 .field-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin:16px 0 6px}
-input[type=text],input[type=password]{width:100%;font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
-input:focus{border-color:var(--text)}
+input[type=text],input[type=password],textarea{font-family:'DM Sans',sans-serif;font-size:15px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s;width:100%}
+input[type=text],input[type=password]{padding:12px 14px}
+textarea{padding:12px 14px;resize:vertical;min-height:80px;line-height:1.5}
+input:focus,textarea:focus{border-color:var(--text)}
 .btn-primary{width:100%;margin-top:14px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);height:50px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:opacity .15s}
 .btn-primary:active{opacity:.8}
 .btn-primary:disabled{opacity:.35;cursor:default}
 .err{color:var(--hoog);font-size:13px;margin-top:8px;display:none}
-
-/* APP */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px 12px;position:sticky;top:0;z-index:10}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.app-title{font-size:20px;font-weight:600;letter-spacing:-.4px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.app-title{font-size:20px;font-weight:600;letter-spacing:-.4px;flex:1}
 .sync-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
 .sync-pill.ok{color:var(--laag);border-color:#9FD09F;background:var(--laag-bg)}
 .sync-pill.busy{color:var(--mid);border-color:#EFC97A;background:var(--mid-bg)}
@@ -59,17 +55,21 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .fb{font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);white-space:nowrap;cursor:pointer;transition:all .15s}
 .fb.on{background:var(--text);color:#fff;border-color:var(--text)}
 main{padding:14px 16px}
-.sec-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px 2px}
-.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:7px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none;transition:opacity .2s,transform .12s}
-.task-card:active{transform:scale(0.985)}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px 2px;display:flex;align-items:center;justify-content:space-between}
+.sort-btn{font-size:11px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px;transition:color .15s;white-space:nowrap}
+.sort-btn:active{color:var(--text2)}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:7px;display:flex;align-items:flex-start;gap:12px;transition:opacity .2s}
 .task-card.done{opacity:.38}
 .task-card.bezig{border-left:3px solid var(--bezig)}
-.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;transition:all .15s}
+.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;transition:all .15s;cursor:pointer}
 .task-card.done .chk{background:var(--text);border-color:var(--text)}
 .task-card.bezig .chk{background:var(--bezig);border-color:var(--bezig)}
-.tbody{flex:1;min-width:0}
-.ttext{font-size:15px;line-height:1.4;color:var(--text);margin-bottom:6px;word-break:break-word}
+.tbody{flex:1;min-width:0;cursor:pointer}
+.ttext{font-size:15px;line-height:1.4;color:var(--text);margin-bottom:5px;word-break:break-word}
 .task-card.done .ttext{text-decoration:line-through;color:var(--text3)}
+.tnote-preview{font-size:12px;color:var(--text3);margin-bottom:6px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.timg-preview{display:flex;gap:5px;margin-bottom:6px}
+.timg-preview img{width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
 .tags{display:flex;gap:5px;flex-wrap:wrap}
 .tag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
 .t-hoog{background:var(--hoog-bg);color:var(--hoog)}
@@ -78,11 +78,10 @@ main{padding:14px 16px}
 .t-werk{background:var(--werk-bg);color:var(--werk)}
 .t-priv{background:var(--priv-bg);color:var(--priv)}
 .t-bezig{background:var(--bezig-bg);color:var(--bezig)}
-.tdel{width:30px;height:30px;border-radius:50%;background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:-3px -5px 0 0;transition:color .15s}
-.tdel:active{color:var(--hoog)}
+.card-actions{display:flex;flex-direction:column;gap:2px;margin:-2px -5px 0 0}
+.icon-btn{width:28px;height:28px;border-radius:6px;background:none;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:active{background:var(--surface2)}
 .empty{text-align:center;padding:48px 16px;color:var(--text3);font-size:14px}
-
-/* ADD FORM */
 .add-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:12px 16px 0}
 .add-input{width:100%;font-family:'DM Sans',sans-serif;font-size:15px;border:none;background:transparent;color:var(--text);outline:none;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px}
 .add-input::placeholder{color:var(--text3)}
@@ -98,45 +97,74 @@ main{padding:14px 16px}
 .sb.s-priv{background:var(--priv-bg);border-color:var(--priv);color:var(--priv);font-weight:600}
 .add-btn{width:100%;background:var(--text);color:#fff;border:none;border-radius:var(--rs);height:44px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s}
 .add-btn:active{opacity:.8}
-
 .logout-link{display:block;text-align:center;margin-top:20px;font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:41;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.sheet-inner{padding:10px 20px 48px}
+.sh{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-size:17px;font-weight:600;margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.sheet-close{font-size:22px;color:var(--text3);cursor:pointer;background:none;border:none;line-height:1;flex-shrink:0;padding:0}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.sheet-save{width:100%;margin-top:18px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);height:50px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.sheet-save:active{opacity:.8}
+.sp-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px}
+.sp-opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .12s}
+.sp-opt:active{transform:scale(0.96)}
+.sp-opt.act-todo{border-color:var(--text);background:#F5F3EE;border-width:2px}
+.sp-opt.act-bezig{border-color:var(--bezig);background:var(--bezig-bg);border-width:2px}
+.sp-opt.act-done{border-color:var(--laag);background:var(--laag-bg);border-width:2px}
+.sp-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.sp-icon.todo{background:var(--border)}
+.sp-icon.bezig{background:var(--bezig)}
+.sp-icon.done{background:var(--laag)}
+.sp-lbl{font-size:13px;font-weight:500;color:var(--text2)}
+.img-upload-area{border:2px dashed var(--border);border-radius:var(--rs);padding:16px;text-align:center;cursor:pointer;transition:border-color .15s;background:var(--surface2)}
+.img-upload-area:active{border-color:var(--text2)}
+.img-upload-area input{display:none}
+.img-upload-area p{font-size:13px;color:var(--text3);margin-top:6px}
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.img-thumb{position:relative;aspect-ratio:1;border-radius:var(--rs);overflow:hidden;border:1px solid var(--border)}
+.img-thumb img{width:100%;height:100%;object-fit:cover}
+.img-thumb-del{position:absolute;top:3px;right:3px;width:20px;height:20px;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.detail-img-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.detail-img{border-radius:var(--rs);overflow:hidden;border:1px solid var(--border);aspect-ratio:1}
+.detail-img img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.detail-note{font-size:14px;color:var(--text2);line-height:1.6;white-space:pre-wrap;margin-top:8px;padding:12px;background:var(--surface2);border-radius:var(--rs)}
+.detail-section-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin:16px 0 6px}
+.detail-actions{display:flex;gap:8px;margin-top:20px}
+.detail-actions button{flex:1;height:44px;border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s}
+.detail-edit-btn{background:var(--text)!important;color:#fff!important;border-color:var(--text)!important}
+.detail-del-btn{color:var(--hoog)!important;border-color:#F5C0B0!important}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;display:none;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:95vw;max-height:95vh;border-radius:8px;object-fit:contain}
+.lightbox-close{position:absolute;top:16px;right:16px;color:#fff;font-size:28px;cursor:pointer;background:none;border:none;line-height:1}
 </style>
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
 <div id="setup" class="screen active">
   <div class="setup-icon">📋</div>
   <h1>Mijn Taken</h1>
-  <p class="sub">Verbind eenmalig met GitHub om je taken overal gesynchroniseerd te houden. Dit duurt 2 minuten en is volledig gratis.</p>
-
-  <div class="step">
-    <div class="step-num">Stap 1</div>
-    <p>Ga naar <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> en log in met je GitHub-account (of maak er gratis een aan).</p>
-  </div>
-  <div class="step">
-    <div class="step-num">Stap 2</div>
-    <p>Geef het token een naam (bijv. <code>mijn-taken</code>), zet de vervaldatum op <strong>No expiration</strong>, en vink alleen <code>gist</code> aan onder Scopes.</p>
-  </div>
-  <div class="step">
-    <div class="step-num">Stap 3</div>
-    <p>Klik op <strong>Generate token</strong> en kopieer de code die verschijnt (begint met <code>ghp_</code>). Plak hem hieronder — hij wordt alleen lokaal opgeslagen op dit apparaat.</p>
-  </div>
-
+  <p class="sub">Verbind eenmalig met GitHub om je taken overal gesynchroniseerd te houden. Volledig gratis, geen betaalgegevens nodig.</p>
+  <div class="step"><div class="step-num">Stap 1</div><p>Ga naar <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> en log in met je GitHub-account.</p></div>
+  <div class="step"><div class="step-num">Stap 2</div><p>Geef het token een naam, zet vervaldatum op <strong>No expiration</strong>, vink <code>gist</code> aan. Kies <strong>Classic token</strong>.</p></div>
+  <div class="step"><div class="step-num">Stap 3</div><p>Klik <strong>Generate token</strong>, kopieer de code (<code>ghp_...</code>) en plak hem hieronder. Hij wordt permanent opgeslagen in deze browser.</p></div>
   <div class="field-lbl">GitHub Personal Access Token</div>
   <input type="password" id="tokenInput" placeholder="ghp_..." autocomplete="off">
-  <div class="err" id="setupErr">Token ongeldig of geen toegang tot Gists. Probeer opnieuw.</div>
+  <div class="err" id="setupErr">Token ongeldig. Controleer of je een Classic token hebt met Gist-toegang.</div>
   <button class="btn-primary" id="connectBtn" onclick="connect()">Verbinden</button>
 </div>
 
-<!-- APP SCREEN -->
 <div id="appScreen" class="screen">
   <header>
     <div class="hdr-top">
       <span class="app-title">Mijn taken</span>
       <button class="sync-pill" id="syncPill" onclick="syncNow()">
-        <div class="sdot"></div>
-        <span id="syncTxt">Laden...</span>
+        <div class="sdot"></div><span id="syncTxt">Laden...</span>
       </button>
     </div>
     <div class="filters">
@@ -149,11 +177,9 @@ main{padding:14px 16px}
       <button class="fb" onclick="setF('done',this)">Gedaan</button>
     </div>
   </header>
-
   <main id="taskList"></main>
-
   <div class="add-box">
-    <input class="add-input" type="text" id="taskInp" placeholder="Nieuwe taak..." autocomplete="off">
+    <input class="add-input" type="text" id="taskInp" placeholder="Nieuwe taak toevoegen..." autocomplete="off">
     <div class="selrow">
       <div>
         <div class="sel-lbl">Prioriteit</div>
@@ -173,206 +199,362 @@ main{padding:14px 16px}
     </div>
     <button class="add-btn" onclick="addTask()">+ Toevoegen</button>
   </div>
-
   <span class="logout-link" onclick="logout()">Uitloggen / ander account</span>
 </div>
 
-<script>
-// ── State ─────────────────────────────────────────────────────────────────
-let tasks=[], filter='alles', prio='mid', cat='werk';
-let token='', gistId='', saveTimer=null;
-const FILENAME='mijn-taken-app.json';
+<div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
 
-// ── Boot ──────────────────────────────────────────────────────────────────
+<!-- STATUS SHEET -->
+<div class="sheet" id="statusSheet">
+  <div class="sheet-inner">
+    <div class="sh"></div>
+    <div class="sheet-title">Status wijzigen <button class="sheet-close" onclick="closeAllSheets()">×</button></div>
+    <div class="sp-options">
+      <div class="sp-opt" id="spTodo" onclick="setStatus('todo')"><div class="sp-icon todo"></div><span class="sp-lbl">Te doen</span></div>
+      <div class="sp-opt" id="spBezig" onclick="setStatus('bezig')"><div class="sp-icon bezig">›</div><span class="sp-lbl">Bezig</span></div>
+      <div class="sp-opt" id="spDone" onclick="setStatus('done')"><div class="sp-icon done">✓</div><span class="sp-lbl">Gedaan</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL SHEET -->
+<div class="sheet" id="detailSheet">
+  <div class="sheet-inner">
+    <div class="sh"></div>
+    <div class="sheet-title"><span id="detailTitle" style="flex:1;word-break:break-word;padding-right:8px"></span><button class="sheet-close" onclick="closeAllSheets()">×</button></div>
+    <div class="tags" id="detailTags" style="margin-bottom:12px"></div>
+    <div id="detailNoteWrap" style="display:none">
+      <div class="detail-section-lbl">Notitie</div>
+      <div class="detail-note" id="detailNote"></div>
+    </div>
+    <div id="detailImgWrap" style="display:none">
+      <div class="detail-section-lbl">Afbeeldingen</div>
+      <div class="detail-img-grid" id="detailImgGrid"></div>
+    </div>
+    <div class="detail-actions">
+      <button class="detail-edit-btn" onclick="openEditFromDetail()">✏️ Bewerken</button>
+      <button class="detail-del-btn" onclick="delFromDetail()">🗑️ Verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="sheet" id="editSheet">
+  <div class="sheet-inner">
+    <div class="sh"></div>
+    <div class="sheet-title">Taak bewerken <button class="sheet-close" onclick="closeAllSheets()">×</button></div>
+    <div class="field">
+      <label>Omschrijving</label>
+      <input type="text" id="editText" placeholder="Wat moet er gedaan worden?">
+    </div>
+    <div class="field">
+      <label>Prioriteit</label>
+      <div class="seg3" id="editPrioSeg">
+        <button class="sb" onclick="setEditPrio('hoog',this)">🔴 Hoog</button>
+        <button class="sb" onclick="setEditPrio('mid',this)">🟡 Midden</button>
+        <button class="sb" onclick="setEditPrio('laag',this)">🟢 Laag</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Categorie</label>
+      <div class="seg2" id="editCatSeg">
+        <button class="sb" onclick="setEditCat('werk',this)">💼 Werk</button>
+        <button class="sb" onclick="setEditCat('privé',this)">🏠 Privé</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Notitie</label>
+      <textarea id="editNote" placeholder="Voeg een notitie toe..."></textarea>
+    </div>
+    <div class="field">
+      <label>Afbeeldingen</label>
+      <div class="img-upload-area" onclick="document.getElementById('imgFileInput').click()">
+        <div style="font-size:28px">📎</div>
+        <p>Tik om foto's of screenshots toe te voegen (max 5MB per stuk)</p>
+        <input type="file" id="imgFileInput" accept="image/*" multiple onchange="handleImages(event)">
+      </div>
+      <div class="img-grid" id="editImgGrid"></div>
+    </div>
+    <button class="sheet-save" onclick="saveEdit()">Opslaan</button>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+let tasks=[],filter='alles',prio='mid',cat='werk';
+let token='',gistId='',saveTimer=null;
+let activeId=null,editPrio='mid',editCat='werk',editImages=[];
+let sortByPrio=true;
+const FILENAME='mijn-taken-app.json';
+const prioOrder={hoog:0,mid:1,laag:2};
+
 (function boot(){
-  token=localStorage.getItem('gh_token')||'';
+  token=localStorage.getItem('gh_token')||sessionStorage.getItem('gh_token')||'';
   gistId=localStorage.getItem('gh_gist_id')||'';
-  if(token){ showApp(); loadFromGist(); }
+  if(token){showApp();loadFromGist();}
 })();
 
-// ── Setup ─────────────────────────────────────────────────────────────────
 async function connect(){
   const t=document.getElementById('tokenInput').value.trim();
-  if(!t){return;}
+  if(!t) return;
   const btn=document.getElementById('connectBtn');
-  btn.disabled=true; btn.textContent='Verbinden...';
+  btn.disabled=true;btn.textContent='Verbinden...';
   document.getElementById('setupErr').style.display='none';
   try{
-    // Verify token works
     const r=await fetch('https://api.github.com/user',{headers:{Authorization:'token '+t}});
-    if(!r.ok) throw new Error('invalid');
+    if(!r.ok) throw new Error();
     token=t;
-    localStorage.setItem('gh_token',t);
+    try{localStorage.setItem('gh_token',t);}catch(e){}
+    try{sessionStorage.setItem('gh_token',t);}catch(e){}
     showApp();
     await findOrCreateGist();
     await loadFromGist();
   }catch(e){
     document.getElementById('setupErr').style.display='block';
-    btn.disabled=false; btn.textContent='Verbinden';
+    btn.disabled=false;btn.textContent='Verbinden';
   }
 }
-
 function showApp(){
   document.getElementById('setup').classList.remove('active');
   document.getElementById('appScreen').classList.add('active');
 }
-
 function logout(){
-  if(!confirm('Uitloggen? Je taken blijven in je GitHub Gist bewaard.')) return;
-  localStorage.removeItem('gh_token');
-  localStorage.removeItem('gh_gist_id');
-  token=''; gistId=''; tasks=[];
+  if(!confirm('Uitloggen? Je taken blijven bewaard in je GitHub Gist.')) return;
+  ['gh_token','gh_gist_id'].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+  try{sessionStorage.removeItem('gh_token');}catch(e){}
+  token='';gistId='';tasks=[];
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('setup').classList.add('active');
 }
 
-// ── Gist API ──────────────────────────────────────────────────────────────
-const ghHeaders=()=>({'Authorization':'token '+token,'Content-Type':'application/json'});
+const ghH=()=>({'Authorization':'token '+token,'Content-Type':'application/json'});
 
 async function findOrCreateGist(){
   setSyncState('busy','Zoeken...');
-  // Search existing gists for our file
   let page=1;
   while(true){
-    const r=await fetch(`https://api.github.com/gists?per_page=100&page=${page}`,{headers:ghHeaders()});
+    const r=await fetch(`https://api.github.com/gists?per_page=100&page=${page}`,{headers:ghH()});
     if(!r.ok) break;
     const list=await r.json();
     if(!list.length) break;
     const found=list.find(g=>g.files&&g.files[FILENAME]);
-    if(found){gistId=found.id;localStorage.setItem('gh_gist_id',gistId);return;}
+    if(found){gistId=found.id;try{localStorage.setItem('gh_gist_id',gistId);}catch(e){}return;}
     if(list.length<100) break;
     page++;
   }
-  // Create new gist
-  const r=await fetch('https://api.github.com/gists',{
-    method:'POST',headers:ghHeaders(),
-    body:JSON.stringify({description:'Mijn Taken App',public:false,files:{[FILENAME]:{content:JSON.stringify([])}}})
-  });
+  const r=await fetch('https://api.github.com/gists',{method:'POST',headers:ghH(),
+    body:JSON.stringify({description:'Mijn Taken App',public:false,files:{[FILENAME]:{content:JSON.stringify([])}}})});
   const g=await r.json();
   gistId=g.id;
-  localStorage.setItem('gh_gist_id',gistId);
+  try{localStorage.setItem('gh_gist_id',gistId);}catch(e){}
 }
-
 async function loadFromGist(){
   setSyncState('busy','Laden...');
   try{
     if(!gistId) await findOrCreateGist();
-    const r=await fetch(`https://api.github.com/gists/${gistId}`,{headers:ghHeaders()});
+    const r=await fetch(`https://api.github.com/gists/${gistId}`,{headers:ghH()});
     if(!r.ok) throw new Error();
     const g=await r.json();
-    const raw=g.files[FILENAME]?.content||'[]';
-    tasks=JSON.parse(raw);
-    setSyncState('ok','Gesynchroniseerd');
-    render();
-  }catch(e){
-    setSyncState('err','Sync mislukt');
-    render();
-  }
+    tasks=JSON.parse(g.files[FILENAME]?.content||'[]');
+    setSyncState('ok','Gesynchroniseerd');render();
+  }catch(e){setSyncState('err','Sync mislukt');render();}
 }
-
 async function saveToGist(){
+  if(!gistId) return;
   setSyncState('busy','Opslaan...');
   try{
-    await fetch(`https://api.github.com/gists/${gistId}`,{
-      method:'PATCH',headers:ghHeaders(),
-      body:JSON.stringify({files:{[FILENAME]:{content:JSON.stringify(tasks)}}})
-    });
+    await fetch(`https://api.github.com/gists/${gistId}`,{method:'PATCH',headers:ghH(),
+      body:JSON.stringify({files:{[FILENAME]:{content:JSON.stringify(tasks)}}})});
     setSyncState('ok','Gesynchroniseerd');
-  }catch(e){ setSyncState('err','Opslaan mislukt'); }
+  }catch(e){setSyncState('err','Opslaan mislukt');}
 }
-
-function debounceSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveToGist,700); }
-function syncNow(){ loadFromGist(); }
-
+function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToGist,800);}
+function syncNow(){loadFromGist();}
 function setSyncState(s,txt){
-  const p=document.getElementById('syncPill');
-  p.className='sync-pill '+s;
+  document.getElementById('syncPill').className='sync-pill '+s;
   document.getElementById('syncTxt').textContent=txt;
 }
 
-// ── Task logic ────────────────────────────────────────────────────────────
-function setF(f,btn){
-  filter=f;
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); render();
-}
-function setPrio(p,btn){
-  prio=p;
-  document.querySelectorAll('#prioSeg .sb').forEach(b=>b.className='sb');
-  btn.className='sb s-'+p;
-}
-function setCat(c,btn){
-  cat=c;
-  document.querySelectorAll('#catSeg .sb').forEach(b=>b.className='sb');
-  btn.className='sb s-'+(c==='privé'?'priv':'werk');
-}
+function setF(f,btn){filter=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');render();}
+function setPrio(p,btn){prio=p;document.querySelectorAll('#prioSeg .sb').forEach(b=>b.className='sb');btn.className='sb s-'+p;}
+function setCat(c,btn){cat=c;document.querySelectorAll('#catSeg .sb').forEach(b=>b.className='sb');btn.className='sb s-'+(c==='privé'?'priv':'werk');}
+function toggleSort(){sortByPrio=!sortByPrio;render();}
+
 function addTask(){
   const inp=document.getElementById('taskInp');
   const text=inp.value.trim();
   if(!text) return;
-  tasks.unshift({id:Date.now(),text,prio,cat,status:'todo'});
-  inp.value=''; render(); debounceSave();
+  tasks.unshift({id:Date.now(),text,prio,cat,status:'todo',note:'',images:[]});
+  inp.value='';render();debounceSave();
 }
-function toggle(id){
+
+function openSheet(id){
+  closeAllSheets(true);
+  document.getElementById(id).classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeAllSheets(silent){
+  ['statusSheet','detailSheet','editSheet'].forEach(id=>document.getElementById(id).classList.remove('open'));
+  if(!silent){document.getElementById('overlay').classList.remove('open');activeId=null;}
+}
+
+function openStatusPicker(id,e){
+  e.stopPropagation();activeId=id;
+  const t=tasks.find(x=>x.id===id);
+  const st=t?t.status||'todo':'todo';
+  ['spTodo','spBezig','spDone'].forEach(el=>{
+    const e=document.getElementById(el);
+    e.className=e.className.replace(/ act-\w+/g,'');
+  });
+  const map={todo:'spTodo',bezig:'spBezig',done:'spDone'};
+  if(map[st]) document.getElementById(map[st]).className+=' act-'+st;
+  openSheet('statusSheet');
+}
+function setStatus(st){
+  const t=tasks.find(x=>x.id===activeId);
+  if(t){t.status=st;debounceSave();}
+  closeAllSheets();render();
+}
+
+function openDetail(id){
+  activeId=id;
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
-  if(t.status==='todo') t.status='bezig';
-  else if(t.status==='bezig') t.status='done';
-  else t.status='todo';
-  render(); debounceSave();
+  const pLabels={hoog:'Hoog',mid:'Midden',laag:'Laag'};
+  const pTag={hoog:'t-hoog',mid:'t-mid',laag:'t-laag'};
+  const st=t.status||'todo';
+  document.getElementById('detailTitle').textContent=t.text;
+  document.getElementById('detailTags').innerHTML=
+    `<span class="tag ${pTag[t.prio]||'t-mid'}">${pLabels[t.prio]||'Midden'}</span>
+     <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
+     ${st==='bezig'?'<span class="tag t-bezig">Bezig</span>':''}
+     ${st==='done'?'<span class="tag" style="background:var(--laag-bg);color:var(--laag)">Gedaan</span>':''}`;
+  const nw=document.getElementById('detailNoteWrap');
+  if(t.note){nw.style.display='';document.getElementById('detailNote').textContent=t.note;}
+  else nw.style.display='none';
+  const iw=document.getElementById('detailImgWrap');
+  const ig=document.getElementById('detailImgGrid');
+  if(t.images&&t.images.length){
+    iw.style.display='';
+    ig.innerHTML=t.images.map((s,i)=>`<div class="detail-img"><img src="${s}" alt="Afbeelding ${i+1}" onclick="openLightbox(this.src)"></div>`).join('');
+  }else iw.style.display='none';
+  openSheet('detailSheet');
+}
+function openEditFromDetail(){closeAllSheets(true);openEditSheet(activeId);}
+function delFromDetail(){
+  if(!confirm('Taak verwijderen?')) return;
+  tasks=tasks.filter(x=>x.id!==activeId);
+  closeAllSheets();render();debounceSave();
+}
+
+function openEditSheet(id){
+  activeId=id;
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  editPrio=t.prio||'mid';editCat=t.cat||'werk';editImages=[...(t.images||[])];
+  document.getElementById('editText').value=t.text;
+  document.getElementById('editNote').value=t.note||'';
+  document.querySelectorAll('#editPrioSeg .sb').forEach(b=>b.className='sb');
+  const pi={hoog:0,mid:1,laag:2}[editPrio]||1;
+  document.querySelectorAll('#editPrioSeg .sb')[pi].className='sb s-'+editPrio;
+  document.querySelectorAll('#editCatSeg .sb').forEach(b=>b.className='sb');
+  document.querySelectorAll('#editCatSeg .sb')[editCat==='werk'?0:1].className='sb s-'+(editCat==='privé'?'priv':'werk');
+  renderEditImages();
+  openSheet('editSheet');
+}
+function setEditPrio(p,btn){editPrio=p;document.querySelectorAll('#editPrioSeg .sb').forEach(b=>b.className='sb');btn.className='sb s-'+p;}
+function setEditCat(c,btn){editCat=c;document.querySelectorAll('#editCatSeg .sb').forEach(b=>b.className='sb');btn.className='sb s-'+(c==='privé'?'priv':'werk');}
+function handleImages(e){
+  [...e.target.files].forEach(f=>{
+    if(f.size>5*1024*1024){alert('Afbeelding te groot (max 5MB)');return;}
+    const r=new FileReader();
+    r.onload=ev=>{editImages.push(ev.target.result);renderEditImages();};
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function renderEditImages(){
+  document.getElementById('editImgGrid').innerHTML=editImages.map((s,i)=>
+    `<div class="img-thumb"><img src="${s}" alt=""><button class="img-thumb-del" onclick="removeImg(${i})">×</button></div>`
+  ).join('');
+}
+function removeImg(i){editImages.splice(i,1);renderEditImages();}
+function saveEdit(){
+  const text=document.getElementById('editText').value.trim();
+  if(!text) return;
+  const t=tasks.find(x=>x.id===activeId);
+  if(!t) return;
+  t.text=text;t.prio=editPrio;t.cat=editCat;
+  t.note=document.getElementById('editNote').value.trim();
+  t.images=[...editImages];
+  closeAllSheets();render();debounceSave();
 }
 function del(id,e){
   e.stopPropagation();
   if(!confirm('Taak verwijderen?')) return;
-  tasks=tasks.filter(x=>x.id!==id); render(); debounceSave();
+  tasks=tasks.filter(x=>x.id!==id);render();debounceSave();
 }
+function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
 
-// ── Render ────────────────────────────────────────────────────────────────
 function render(){
+  const getStatus=t=>t.status||(t.done?'done':'todo');
   let list=tasks;
   if(filter==='werk') list=tasks.filter(t=>t.cat==='werk');
   else if(filter==='privé') list=tasks.filter(t=>t.cat==='privé');
   else if(filter==='hoog') list=tasks.filter(t=>t.prio==='hoog');
-  else if(filter==='todo') list=tasks.filter(t=>t.status==='todo'||(!t.status&&!t.done));
-  else if(filter==='bezig') list=tasks.filter(t=>t.status==='bezig');
-  else if(filter==='done') list=tasks.filter(t=>t.status==='done'||(t.done&&!t.status));
+  else if(filter==='todo') list=tasks.filter(t=>getStatus(t)==='todo');
+  else if(filter==='bezig') list=tasks.filter(t=>getStatus(t)==='bezig');
+  else if(filter==='done') list=tasks.filter(t=>getStatus(t)==='done');
 
-  const getStatus=t=>t.status||(t.done?'done':'todo');
-  const todo=list.filter(t=>getStatus(t)==='todo');
-  const bezig=list.filter(t=>getStatus(t)==='bezig');
+  const srt=arr=>sortByPrio?[...arr].sort((a,b)=>(prioOrder[a.prio]||1)-(prioOrder[b.prio]||1)):arr;
+  const todo=srt(list.filter(t=>getStatus(t)==='todo'));
+  const bezig=srt(list.filter(t=>getStatus(t)==='bezig'));
   const done=list.filter(t=>getStatus(t)==='done');
   const el=document.getElementById('taskList');
-
   if(!list.length){el.innerHTML='<div class="empty">Geen taken gevonden</div>';return;}
 
-  const pLabels={hoog:'Hoog',mid:'Midden',laag:'Laag'};
-  const pTag={hoog:'t-hoog',mid:'t-mid',laag:'t-laag'};
-  const statusIcon={todo:'',bezig:'›',done:'✓'};
+  const pL={hoog:'Hoog',mid:'Midden',laag:'Laag'};
+  const pT={hoog:'t-hoog',mid:'t-mid',laag:'t-laag'};
+  const sI={todo:'',bezig:'›',done:'✓'};
 
-  const cardHTML=t=>{
+  const card=t=>{
     const st=getStatus(t);
-    return`<div class="task-card ${st}" onclick="toggle(${t.id})">
-      <div class="chk">${statusIcon[st]||''}</div>
-      <div class="tbody">
+    const hasNote=t.note&&t.note.trim();
+    const hasImgs=t.images&&t.images.length;
+    return`<div class="task-card ${st}">
+      <div class="chk ${st}" onclick="openStatusPicker(${t.id},event)">${sI[st]||''}</div>
+      <div class="tbody" onclick="openDetail(${t.id})">
         <div class="ttext">${t.text}</div>
+        ${hasNote?`<div class="tnote-preview">${t.note}</div>`:''}
+        ${hasImgs?`<div class="timg-preview">${t.images.slice(0,3).map(s=>`<img src="${s}" alt="">`).join('')}</div>`:''}
         <div class="tags">
-          <span class="tag ${pTag[t.prio]||'t-mid'}">${pLabels[t.prio]||'Midden'}</span>
+          <span class="tag ${pT[t.prio]||'t-mid'}">${pL[t.prio]||'Midden'}</span>
           <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
           ${st==='bezig'?'<span class="tag t-bezig">Bezig</span>':''}
         </div>
       </div>
-      <button class="tdel" onclick="del(${t.id},event)">×</button>
+      <div class="card-actions">
+        <button class="icon-btn" title="Bewerken" onclick="openEditSheet(${t.id})">✏️</button>
+        <button class="icon-btn" title="Verwijderen" onclick="del(${t.id},event)">🗑️</button>
+      </div>
     </div>`;
   };
 
+  const sortLbl=`↕ ${sortByPrio?'Prioriteit':'Aanmaak'}`;
   let html='';
-  if(todo.length) html+='<div class="sec-lbl">Te doen — '+todo.length+'</div>'+todo.map(cardHTML).join('');
-  if(bezig.length) html+='<div class="sec-lbl">Bezig — '+bezig.length+'</div>'+bezig.map(cardHTML).join('');
-  if(done.length) html+='<div class="sec-lbl">Gedaan — '+done.length+'</div>'+done.map(cardHTML).join('');
+  if(todo.length) html+=`<div class="sec-lbl"><span>Te doen — ${todo.length}</span><button class="sort-btn" onclick="toggleSort()">${sortLbl}</button></div>${todo.map(card).join('')}`;
+  if(bezig.length) html+=`<div class="sec-lbl">Bezig — ${bezig.length}</div>${bezig.map(card).join('')}`;
+  if(done.length) html+=`<div class="sec-lbl">Gedaan — ${done.length}</div>${done.map(card).join('')}`;
   el.innerHTML=html;
 }
 
-document.getElementById('taskInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTask()});
+document.getElementById('taskInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
 </script>
 </body>
 </html>
