@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Mijn Taken</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F5F3EE; --surface:#FFF; --surface2:#EDEAE3; --border:#D8D4CA;
+  --text:#1A1814; --text2:#7A7570; --text3:#B0ABA4;
+  --hoog:#C4391A; --hoog-bg:#FDF0EC;
+  --mid:#C47A00;  --mid-bg:#FDF5E6;
+  --laag:#3A7A3A; --laag-bg:#EDF5ED;
+  --werk:#1A4A8A; --werk-bg:#EBF0FA;
+  --priv:#5A3A8A; --priv-bg:#F2EEF9;
+  --r:14px; --rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:20px}
+
+/* SCREENS */
+.screen{display:none;padding:24px 20px}
+.screen.active{display:block}
+
+/* SETUP */
+.setup-icon{font-size:48px;text-align:center;margin-bottom:16px}
+h1{font-size:22px;font-weight:600;letter-spacing:-.4px;margin-bottom:8px}
+.sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.step-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px}
+.step p{font-size:14px;color:var(--text);line-height:1.5}
+.step a{color:var(--werk);text-decoration:none;font-weight:500}
+.step code{font-family:'DM Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--text)}
+.field-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin:16px 0 6px}
+input[type=text],input[type=password]{width:100%;font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+input:focus{border-color:var(--text)}
+.btn-primary{width:100%;margin-top:14px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);height:50px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.btn-primary:active{opacity:.8}
+.btn-primary:disabled{opacity:.35;cursor:default}
+.err{color:var(--hoog);font-size:13px;margin-top:8px;display:none}
+
+/* APP */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px 12px;position:sticky;top:0;z-index:10}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.app-title{font-size:20px;font-weight:600;letter-spacing:-.4px}
+.sync-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.sync-pill.ok{color:var(--laag);border-color:#9FD09F;background:var(--laag-bg)}
+.sync-pill.busy{color:var(--mid);border-color:#EFC97A;background:var(--mid-bg)}
+.sync-pill.err{color:var(--hoog);border-color:#F5A898;background:var(--hoog-bg)}
+.sdot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.sync-pill.busy .sdot{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fb{font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);white-space:nowrap;cursor:pointer;transition:all .15s}
+.fb.on{background:var(--text);color:#fff;border-color:var(--text)}
+main{padding:14px 16px}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:16px 0 8px 2px}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:7px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none;transition:opacity .2s,transform .12s}
+.task-card:active{transform:scale(0.985)}
+.task-card.done{opacity:.38}
+.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;transition:all .15s}
+.task-card.done .chk{background:var(--text);border-color:var(--text)}
+.tbody{flex:1;min-width:0}
+.ttext{font-size:15px;line-height:1.4;color:var(--text);margin-bottom:6px;word-break:break-word}
+.task-card.done .ttext{text-decoration:line-through;color:var(--text3)}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.t-hoog{background:var(--hoog-bg);color:var(--hoog)}
+.t-mid{background:var(--mid-bg);color:var(--mid)}
+.t-laag{background:var(--laag-bg);color:var(--laag)}
+.t-werk{background:var(--werk-bg);color:var(--werk)}
+.t-priv{background:var(--priv-bg);color:var(--priv)}
+.tdel{width:30px;height:30px;border-radius:50%;background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:-3px -5px 0 0;transition:color .15s}
+.tdel:active{color:var(--hoog)}
+.empty{text-align:center;padding:48px 16px;color:var(--text3);font-size:14px}
+
+/* ADD FORM */
+.add-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:12px 16px 0}
+.add-input{width:100%;font-family:'DM Sans',sans-serif;font-size:15px;border:none;background:transparent;color:var(--text);outline:none;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.add-input::placeholder{color:var(--text3)}
+.selrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sel-lbl{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.seg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.sb{font-size:12px;font-weight:500;padding:9px 4px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;text-align:center;transition:all .12s}
+.sb.s-hoog{background:var(--hoog-bg);border-color:var(--hoog);color:var(--hoog);font-weight:600}
+.sb.s-mid{background:var(--mid-bg);border-color:var(--mid);color:var(--mid);font-weight:600}
+.sb.s-laag{background:var(--laag-bg);border-color:var(--laag);color:var(--laag);font-weight:600}
+.sb.s-werk{background:var(--werk-bg);border-color:var(--werk);color:var(--werk);font-weight:600}
+.sb.s-priv{background:var(--priv-bg);border-color:var(--priv);color:var(--priv);font-weight:600}
+.add-btn{width:100%;background:var(--text);color:#fff;border:none;border-radius:var(--rs);height:44px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.add-btn:active{opacity:.8}
+
+.logout-link{display:block;text-align:center;margin-top:20px;font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup" class="screen active">
+  <div class="setup-icon">📋</div>
+  <h1>Mijn Taken</h1>
+  <p class="sub">Verbind eenmalig met GitHub om je taken overal gesynchroniseerd te houden. Dit duurt 2 minuten en is volledig gratis.</p>
+
+  <div class="step">
+    <div class="step-num">Stap 1</div>
+    <p>Ga naar <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> en log in met je GitHub-account (of maak er gratis een aan).</p>
+  </div>
+  <div class="step">
+    <div class="step-num">Stap 2</div>
+    <p>Geef het token een naam (bijv. <code>mijn-taken</code>), zet de vervaldatum op <strong>No expiration</strong>, en vink alleen <code>gist</code> aan onder Scopes.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">Stap 3</div>
+    <p>Klik op <strong>Generate token</strong> en kopieer de code die verschijnt (begint met <code>ghp_</code>). Plak hem hieronder — hij wordt alleen lokaal opgeslagen op dit apparaat.</p>
+  </div>
+
+  <div class="field-lbl">GitHub Personal Access Token</div>
+  <input type="password" id="tokenInput" placeholder="ghp_..." autocomplete="off">
+  <div class="err" id="setupErr">Token ongeldig of geen toegang tot Gists. Probeer opnieuw.</div>
+  <button class="btn-primary" id="connectBtn" onclick="connect()">Verbinden</button>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen" class="screen">
+  <header>
+    <div class="hdr-top">
+      <span class="app-title">Mijn taken</span>
+      <button class="sync-pill" id="syncPill" onclick="syncNow()">
+        <div class="sdot"></div>
+        <span id="syncTxt">Laden...</span>
+      </button>
+    </div>
+    <div class="filters">
+      <button class="fb on" onclick="setF('alles',this)">Alles</button>
+      <button class="fb" onclick="setF('werk',this)">Werk</button>
+      <button class="fb" onclick="setF('privé',this)">Privé</button>
+      <button class="fb" onclick="setF('hoog',this)">Hoog</button>
+      <button class="fb" onclick="setF('todo',this)">Te doen</button>
+      <button class="fb" onclick="setF('done',this)">Gedaan</button>
+    </div>
+  </header>
+
+  <main id="taskList"></main>
+
+  <div class="add-box">
+    <input class="add-input" type="text" id="taskInp" placeholder="Nieuwe taak..." autocomplete="off">
+    <div class="selrow">
+      <div>
+        <div class="sel-lbl">Prioriteit</div>
+        <div class="seg3" id="prioSeg">
+          <button class="sb" onclick="setPrio('hoog',this)">Hoog</button>
+          <button class="sb s-mid" onclick="setPrio('mid',this)">Midden</button>
+          <button class="sb" onclick="setPrio('laag',this)">Laag</button>
+        </div>
+      </div>
+      <div>
+        <div class="sel-lbl">Categorie</div>
+        <div class="seg2" id="catSeg">
+          <button class="sb s-werk" onclick="setCat('werk',this)">Werk</button>
+          <button class="sb" onclick="setCat('privé',this)">Privé</button>
+        </div>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addTask()">+ Toevoegen</button>
+  </div>
+
+  <span class="logout-link" onclick="logout()">Uitloggen / ander account</span>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+let tasks=[], filter='alles', prio='mid', cat='werk';
+let token='', gistId='', saveTimer=null;
+const FILENAME='mijn-taken-app.json';
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+(function boot(){
+  token=localStorage.getItem('gh_token')||'';
+  gistId=localStorage.getItem('gh_gist_id')||'';
+  if(token){ showApp(); loadFromGist(); }
+})();
+
+// ── Setup ─────────────────────────────────────────────────────────────────
+async function connect(){
+  const t=document.getElementById('tokenInput').value.trim();
+  if(!t){return;}
+  const btn=document.getElementById('connectBtn');
+  btn.disabled=true; btn.textContent='Verbinden...';
+  document.getElementById('setupErr').style.display='none';
+  try{
+    // Verify token works
+    const r=await fetch('https://api.github.com/user',{headers:{Authorization:'token '+t}});
+    if(!r.ok) throw new Error('invalid');
+    token=t;
+    localStorage.setItem('gh_token',t);
+    showApp();
+    await findOrCreateGist();
+    await loadFromGist();
+  }catch(e){
+    document.getElementById('setupErr').style.display='block';
+    btn.disabled=false; btn.textContent='Verbinden';
+  }
+}
+
+function showApp(){
+  document.getElementById('setup').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+}
+
+function logout(){
+  if(!confirm('Uitloggen? Je taken blijven in je GitHub Gist bewaard.')) return;
+  localStorage.removeItem('gh_token');
+  localStorage.removeItem('gh_gist_id');
+  token=''; gistId=''; tasks=[];
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('setup').classList.add('active');
+}
+
+// ── Gist API ──────────────────────────────────────────────────────────────
+const ghHeaders=()=>({'Authorization':'token '+token,'Content-Type':'application/json'});
+
+async function findOrCreateGist(){
+  setSyncState('busy','Zoeken...');
+  // Search existing gists for our file
+  let page=1;
+  while(true){
+    const r=await fetch(`https://api.github.com/gists?per_page=100&page=${page}`,{headers:ghHeaders()});
+    if(!r.ok) break;
+    const list=await r.json();
+    if(!list.length) break;
+    const found=list.find(g=>g.files&&g.files[FILENAME]);
+    if(found){gistId=found.id;localStorage.setItem('gh_gist_id',gistId);return;}
+    if(list.length<100) break;
+    page++;
+  }
+  // Create new gist
+  const r=await fetch('https://api.github.com/gists',{
+    method:'POST',headers:ghHeaders(),
+    body:JSON.stringify({description:'Mijn Taken App',public:false,files:{[FILENAME]:{content:JSON.stringify([])}}})
+  });
+  const g=await r.json();
+  gistId=g.id;
+  localStorage.setItem('gh_gist_id',gistId);
+}
+
+async function loadFromGist(){
+  setSyncState('busy','Laden...');
+  try{
+    if(!gistId) await findOrCreateGist();
+    const r=await fetch(`https://api.github.com/gists/${gistId}`,{headers:ghHeaders()});
+    if(!r.ok) throw new Error();
+    const g=await r.json();
+    const raw=g.files[FILENAME]?.content||'[]';
+    tasks=JSON.parse(raw);
+    setSyncState('ok','Gesynchroniseerd');
+    render();
+  }catch(e){
+    setSyncState('err','Sync mislukt');
+    render();
+  }
+}
+
+async function saveToGist(){
+  setSyncState('busy','Opslaan...');
+  try{
+    await fetch(`https://api.github.com/gists/${gistId}`,{
+      method:'PATCH',headers:ghHeaders(),
+      body:JSON.stringify({files:{[FILENAME]:{content:JSON.stringify(tasks)}}})
+    });
+    setSyncState('ok','Gesynchroniseerd');
+  }catch(e){ setSyncState('err','Opslaan mislukt'); }
+}
+
+function debounceSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveToGist,700); }
+function syncNow(){ loadFromGist(); }
+
+function setSyncState(s,txt){
+  const p=document.getElementById('syncPill');
+  p.className='sync-pill '+s;
+  document.getElementById('syncTxt').textContent=txt;
+}
+
+// ── Task logic ────────────────────────────────────────────────────────────
+function setF(f,btn){
+  filter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); render();
+}
+function setPrio(p,btn){
+  prio=p;
+  document.querySelectorAll('#prioSeg .sb').forEach(b=>b.className='sb');
+  btn.className='sb s-'+p;
+}
+function setCat(c,btn){
+  cat=c;
+  document.querySelectorAll('#catSeg .sb').forEach(b=>b.className='sb');
+  btn.className='sb s-'+(c==='privé'?'priv':'werk');
+}
+function addTask(){
+  const inp=document.getElementById('taskInp');
+  const text=inp.value.trim();
+  if(!text) return;
+  tasks.unshift({id:Date.now(),text,prio,cat,done:false});
+  inp.value=''; render(); debounceSave();
+}
+function toggle(id){
+  const t=tasks.find(x=>x.id===id);
+  if(t){t.done=!t.done;render();debounceSave();}
+}
+function del(id,e){
+  e.stopPropagation();
+  if(!confirm('Taak verwijderen?')) return;
+  tasks=tasks.filter(x=>x.id!==id); render(); debounceSave();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function render(){
+  let list=tasks;
+  if(filter==='werk') list=tasks.filter(t=>t.cat==='werk');
+  else if(filter==='privé') list=tasks.filter(t=>t.cat==='privé');
+  else if(filter==='hoog') list=tasks.filter(t=>t.prio==='hoog');
+  else if(filter==='todo') list=tasks.filter(t=>!t.done);
+  else if(filter==='done') list=tasks.filter(t=>t.done);
+
+  const todo=list.filter(t=>!t.done);
+  const done=list.filter(t=>t.done);
+  const el=document.getElementById('taskList');
+
+  if(!list.length){el.innerHTML='<div class="empty">Geen taken gevonden</div>';return;}
+
+  const pLabels={hoog:'Hoog',mid:'Midden',laag:'Laag'};
+  const pTag={hoog:'t-hoog',mid:'t-mid',laag:'t-laag'};
+
+  const cardHTML=t=>`<div class="task-card${t.done?' done':''}" onclick="toggle(${t.id})">
+    <div class="chk">${t.done?'✓':''}</div>
+    <div class="tbody">
+      <div class="ttext">${t.text}</div>
+      <div class="tags">
+        <span class="tag ${pTag[t.prio]||'t-mid'}">${pLabels[t.prio]||'Midden'}</span>
+        <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
+      </div>
+    </div>
+    <button class="tdel" onclick="del(${t.id},event)">×</button>
+  </div>`;
+
+  let html='';
+  if(todo.length) html+='<div class="sec-lbl">Te doen — '+todo.length+'</div>'+todo.map(cardHTML).join('');
+  if(done.length) html+='<div class="sec-lbl">Gedaan — '+done.length+'</div>'+done.map(cardHTML).join('');
+  el.innerHTML=html;
+}
+
+document.getElementById('taskInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTask()});
+</script>
+</body>
+</html>
