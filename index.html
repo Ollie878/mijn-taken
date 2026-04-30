@@ -87,6 +87,11 @@ main{padding:14px 16px}
 .t-bezig{background:var(--bezig-bg);color:var(--bezig)}
 .t-deadline{background:var(--deadline-bg);color:var(--deadline)}
 .card-actions{display:flex;flex-direction:column;gap:2px;margin:-2px -5px 0 0}
+.drag-handle{font-size:16px;color:var(--text3);cursor:grab;padding:2px 4px;margin-top:1px;flex-shrink:0;touch-action:none;user-select:none;line-height:1.4}
+.drag-handle:active{cursor:grabbing}
+.task-card.dragging{opacity:.4;border:2px dashed var(--border)}
+.task-card.drag-over-top{border-top:2px solid var(--text)}
+.task-card.drag-over-bot{border-bottom:2px solid var(--text)}
 .icon-btn{width:28px;height:28px;border-radius:6px;background:none;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .icon-btn:active{background:var(--surface2)}
 .empty{text-align:center;padding:48px 16px;color:var(--text3);font-size:14px}
@@ -861,28 +866,41 @@ function openLightbox(src){document.getElementById('lightboxImg').src=src;docume
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
 
 // ── Render taken ──────────────────────────────────────────────────────────
+let dragId=null, dragOverId=null, touchStartY=0, touchDragId=null, touchClone=null;
+
+function getOrder(){
+  // Returns tasks in their manual order (by .order field, fallback to id)
+  return [...tasks].sort((a,b)=>(a.order??a.id)-(b.order??b.id));
+}
+
+function applyManualOrder(orderedIds){
+  orderedIds.forEach((id,i)=>{const t=tasks.find(x=>x.id===id);if(t) t.order=i;});
+}
+
 function render(){
   const getStatus=t=>t.status||(t.done?'done':'todo');
-  let list=tasks;
-  if(filter==='werk') list=tasks.filter(t=>t.cat==='werk');
-  else if(filter==='privé') list=tasks.filter(t=>t.cat==='privé');
-  else if(filter==='hoog') list=tasks.filter(t=>t.prio==='hoog');
-  else if(filter==='todo') list=tasks.filter(t=>getStatus(t)==='todo');
-  else if(filter==='bezig') list=tasks.filter(t=>getStatus(t)==='bezig');
-  else if(filter==='done') list=tasks.filter(t=>getStatus(t)==='done');
+  const ordered=getOrder();
+  let list=ordered;
+  if(filter==='werk') list=ordered.filter(t=>t.cat==='werk');
+  else if(filter==='privé') list=ordered.filter(t=>t.cat==='privé');
+  else if(filter==='hoog') list=ordered.filter(t=>t.prio==='hoog');
+  else if(filter==='todo') list=ordered.filter(t=>getStatus(t)==='todo');
+  else if(filter==='bezig') list=ordered.filter(t=>getStatus(t)==='bezig');
+  else if(filter==='done') list=ordered.filter(t=>getStatus(t)==='done');
 
   const srt=arr=>{
-    if(!sortByPrio) return [...arr].sort((a,b)=>b.id-a.id);
+    if(!sortByPrio) return arr; // manual order already applied
     const o={hoog:0,mid:1,laag:2};
     return [...arr].sort((a,b)=>{
       const pa=o.hasOwnProperty(a.prio)?o[a.prio]:99;
       const pb=o.hasOwnProperty(b.prio)?o[b.prio]:99;
-      return pa!==pb?pa-pb:b.id-a.id;
+      return pa!==pb?pa-pb:(a.order??a.id)-(b.order??b.id);
     });
   };
+
   const todo=srt(list.filter(t=>getStatus(t)==='todo'));
   const bezig=srt(list.filter(t=>getStatus(t)==='bezig'));
-  const done=list.filter(t=>getStatus(t)==='done');
+  const done=srt(list.filter(t=>getStatus(t)==='done'));
   const el=document.getElementById('taskList');
   if(!list.length){el.innerHTML='<div class="empty">Geen taken gevonden</div>';return;}
 
@@ -896,7 +914,12 @@ function render(){
     const hasNote=t.note&&t.note.trim();
     const hasImgs=t.images&&t.images.length;
     const isOverdue=t.deadline&&t.deadline<todayStr&&st!=='done';
-    return`<div class="task-card ${st}">
+    return`<div class="task-card ${st}" data-id="${t.id}" draggable="true"
+        ondragstart="onDragStart(event,${t.id})"
+        ondragover="onDragOver(event,${t.id})"
+        ondragend="onDragEnd(event)"
+        ondrop="onDrop(event,${t.id})">
+      <div class="drag-handle" ontouchstart="onTouchStart(event,${t.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)">⠿</div>
       <div class="chk ${st}" onclick="openStatusPicker(${t.id},event)">${sI[st]||''}</div>
       <div class="tbody" onclick="openDetail(${t.id})">
         <div class="ttext">${t.text}</div>
@@ -924,7 +947,111 @@ function render(){
   el.innerHTML=html;
 }
 
+// ── Drag & Drop (desktop) ─────────────────────────────────────────────────
+function onDragStart(e,id){
+  dragId=id;
+  e.dataTransfer.effectAllowed='move';
+  e.currentTarget.classList.add('dragging');
+}
+function onDragOver(e,id){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  if(id===dragId) return;
+  dragOverId=id;
+  document.querySelectorAll('.task-card').forEach(el=>{
+    el.classList.remove('drag-over-top','drag-over-bot');
+    if(parseInt(el.dataset.id)===id){
+      // Determine above or below midpoint
+      const rect=el.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      el.classList.add(e.clientY<mid?'drag-over-top':'drag-over-bot');
+    }
+  });
+}
+function onDrop(e,targetId){
+  e.preventDefault();
+  if(dragId===null||dragId===targetId) return;
+  moveTask(dragId,targetId,e);
+  dragId=null;dragOverId=null;
+}
+function onDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.task-card').forEach(el=>el.classList.remove('drag-over-top','drag-over-bot'));
+  dragId=null;dragOverId=null;
+}
+
+// ── Touch drag (mobile) ───────────────────────────────────────────────────
+function onTouchStart(e,id){
+  if(e.touches.length!==1) return;
+  touchDragId=id;
+  touchStartY=e.touches[0].clientY;
+  const card=e.currentTarget.closest('.task-card');
+  card.classList.add('dragging');
+  // Clone for visual feedback
+  touchClone=card.cloneNode(true);
+  touchClone.style.cssText=`position:fixed;left:${card.getBoundingClientRect().left}px;top:${card.getBoundingClientRect().top}px;width:${card.offsetWidth}px;opacity:.85;pointer-events:none;z-index:999;transition:none;box-shadow:0 8px 24px rgba(0,0,0,.18)`;
+  document.body.appendChild(touchClone);
+}
+function onTouchMove(e){
+  if(touchDragId===null||!touchClone) return;
+  e.preventDefault();
+  const touch=e.touches[0];
+  const dy=touch.clientY-touchStartY;
+  const origCard=document.querySelector(`.task-card[data-id="${touchDragId}"]`);
+  if(origCard){
+    const rect=origCard.getBoundingClientRect();
+    touchClone.style.top=(rect.top+dy)+'px';
+  }
+  // Find card under touch
+  touchClone.style.display='none';
+  const el=document.elementFromPoint(touch.clientX,touch.clientY);
+  touchClone.style.display='';
+  const targetCard=el?el.closest('.task-card'):null;
+  document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('drag-over-top','drag-over-bot'));
+  if(targetCard&&parseInt(targetCard.dataset.id)!==touchDragId){
+    const rect=targetCard.getBoundingClientRect();
+    targetCard.classList.add(touch.clientY<rect.top+rect.height/2?'drag-over-top':'drag-over-bot');
+    dragOverId=parseInt(targetCard.dataset.id);
+  }
+}
+function onTouchEnd(e){
+  if(touchDragId===null) return;
+  if(touchClone){touchClone.remove();touchClone=null;}
+  document.querySelectorAll('.task-card').forEach(c=>{c.classList.remove('dragging','drag-over-top','drag-over-bot');});
+  if(dragOverId&&dragOverId!==touchDragId){
+    const fakeE={clientY: e.changedTouches[0]?e.changedTouches[0].clientY:0};
+    moveTask(touchDragId,dragOverId,fakeE);
+  }
+  touchDragId=null;dragOverId=null;
+}
+
+// ── Move logic ────────────────────────────────────────────────────────────
+function moveTask(fromId,toId,e){
+  // Work on the full ordered list
+  const ordered=getOrder();
+  const fromIdx=ordered.findIndex(t=>t.id===fromId);
+  const toEl=document.querySelector(`.task-card[data-id="${toId}"]`);
+  let toIdx=ordered.findIndex(t=>t.id===toId);
+  if(fromIdx===-1||toIdx===-1) return;
+  // Insert above or below based on mouse/touch position
+  const rect=toEl?toEl.getBoundingClientRect():null;
+  const insertAfter=rect&&(e.clientY>=rect.top+rect.height/2);
+  const [moved]=ordered.splice(fromIdx,1);
+  let newIdx=ordered.findIndex(t=>t.id===toId);
+  if(insertAfter) newIdx+=1;
+  ordered.splice(newIdx,0,moved);
+  applyManualOrder(ordered.map(t=>t.id));
+  // If sortByPrio was on, switch to manual
+  if(sortByPrio){
+    sortByPrio=false;
+    document.getElementById('sortBtn').textContent='↕ Aanmaak';
+    document.getElementById('sortBtn').classList.remove('on');
+  }
+  render();debounceSave();
+}
+
 document.getElementById('taskInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+
 </script>
 </body>
 </html>
