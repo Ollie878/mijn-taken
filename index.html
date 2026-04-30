@@ -348,7 +348,13 @@ main{padding:14px 16px}
         <button class="sb" onclick="setEditCat('privé',this)">🏠 Privé</button>
       </div>
     </div>
-    <div class="field"><label>Deadline (optioneel)</label><input type="date" id="editDeadline"></div>
+    <div class="field">
+      <label>Deadline (optioneel)</label>
+      <div class="time-row">
+        <div><input type="date" id="editDeadline"></div>
+        <div><input type="time" id="editDeadlineTijd" placeholder="Tijdstip (optioneel)"></div>
+      </div>
+    </div>
     <div class="field"><label>Geschatte tijd (optioneel)</label>
       <div class="seg3" id="editDuurSeg">
         <button class="sb" onclick="setEditDuur('',this)">Geen</button>
@@ -558,7 +564,7 @@ function startOfWeek(d){
 function getEventsForDate(dateStr){
   const evts=[];
   afspraken.filter(a=>a.datum===dateStr).forEach(a=>evts.push({type:'afspraak',obj:a,sortKey:a.van||'00:00'}));
-  tasks.filter(t=>t.deadline===dateStr&&t.status!=='done'&&!t.done).forEach(t=>evts.push({type:'deadline',obj:t,sortKey:'23:59'}));
+  tasks.filter(t=>t.deadline===dateStr&&t.status!=='done'&&!t.done).forEach(t=>evts.push({type:'deadline',obj:t,sortKey:t.deadlineTijd||'23:59'}));
   evts.sort((a,b)=>a.sortKey.localeCompare(b.sortKey));
   return evts;
 }
@@ -635,7 +641,7 @@ function eventCardHTML(e){
     const t=e.obj;
     const pL={hoog:'Hoog',mid:'Midden',laag:'Laag'};
     return`<div class="event-card" onclick="openDetail(${t.id})">
-      <div class="event-time-col"><div class="event-time">deadline</div></div>
+      <div class="event-time-col"><div class="event-time">${t.deadlineTijd||'deadline'}</div></div>
       <div class="event-bar deadline"></div>
       <div class="event-body">
         <div class="event-title">${t.text}</div>
@@ -783,7 +789,7 @@ function openDetail(id){
      <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
      ${st==='bezig'?'<span class="tag t-bezig">Bezig</span>':''}
      ${st==='done'?'<span class="tag" style="background:var(--laag-bg);color:var(--laag)">Gedaan</span>':''}
-     ${t.deadline?`<span class="tag t-deadline">⚑ ${t.deadline}</span>`:''}
+     ${t.deadline?`<span class="tag t-deadline">⚑ ${t.deadline}${t.deadlineTijd?' om '+t.deadlineTijd:''}</span>`:''}
      ${t.duur?`<span class="tag" style="background:var(--surface2);color:var(--text2)">⏱ ${t.duur}</span>`:''}`;
   const nw=document.getElementById('detailNoteWrap');
   if(t.note){nw.style.display='';document.getElementById('detailNote').textContent=t.note;}else nw.style.display='none';
@@ -809,6 +815,7 @@ function openEditSheet(id){
   document.getElementById('editText').value=t.text;
   document.getElementById('editNote').value=t.note||'';
   document.getElementById('editDeadline').value=t.deadline||'';
+  document.getElementById('editDeadlineTijd').value=t.deadlineTijd||'';
   document.querySelectorAll('#editPrioSeg .sb').forEach(b=>b.className='sb');
   document.querySelectorAll('#editPrioSeg .sb')[{hoog:0,mid:1,laag:2}[editPrio]||1].className='sb s-'+editPrio;
   document.querySelectorAll('#editCatSeg .sb').forEach(b=>b.className='sb');
@@ -840,6 +847,7 @@ function saveEdit(){
   t.text=text;t.prio=editPrio;t.cat=editCat;
   t.note=document.getElementById('editNote').value.trim();
   t.deadline=document.getElementById('editDeadline').value;
+  t.deadlineTijd=document.getElementById('editDeadlineTijd').value;
   t.duur=editDuur;
   t.images=[...editImages];
   closeAllSheets();render();renderAgenda();debounceSave();
@@ -898,7 +906,7 @@ function render(){
           <span class="tag ${pT[t.prio]||'t-mid'}">${pL[t.prio]||'Midden'}</span>
           <span class="tag ${t.cat==='privé'?'t-priv':'t-werk'}">${t.cat==='privé'?'Privé':'Werk'}</span>
           ${st==='bezig'?'<span class="tag t-bezig">Bezig</span>':''}
-          ${t.deadline?`<span class="tag t-deadline" style="${isOverdue?'background:#FDF0EC;color:#C4391A;font-weight:600':''}">⚑ ${t.deadline}</span>`:''}
+          ${t.deadline?`<span class="tag t-deadline" style="${isOverdue?'background:#FDF0EC;color:#C4391A;font-weight:600':''}">⚑ ${t.deadline}${t.deadlineTijd?' '+t.deadlineTijd:''}</span>`:''}
           ${t.duur?`<span class="tag" style="background:var(--surface2);color:var(--text2)">⏱ ${t.duur}</span>`:''}
         </div>
       </div>
