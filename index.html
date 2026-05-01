@@ -591,24 +591,32 @@ async function saveData(){
   if(!currentUser) return;
   setSyncState('busy','Opslaan...');
   try{
-    // Upsert taken (one row per user)
-    const rt=await sbFetch(`/rest/v1/taken`,{
-      method:'POST',
-      headers:{'Prefer':'resolution=merge-duplicates','Content-Type':'application/json'},
-      body:JSON.stringify({user_id:currentUser.id,data:tasks,updated_at:new Date().toISOString()})
-    });
-    if(!rt.ok){const e=await rt.json();throw new Error(JSON.stringify(e));}
-
-    // Upsert afspraken
-    const ra=await sbFetch(`/rest/v1/afspraken`,{
-      method:'POST',
-      headers:{'Prefer':'resolution=merge-duplicates','Content-Type':'application/json'},
-      body:JSON.stringify({user_id:currentUser.id,data:afspraken,updated_at:new Date().toISOString()})
-    });
-    if(!ra.ok){const e=await ra.json();throw new Error(JSON.stringify(e));}
-
+    // taken: check if row exists then PATCH or POST
+    const cht=await sbFetch(`/rest/v1/taken?user_id=eq.${currentUser.id}&select=id`);
+    const ext=await cht.json();
+    if(ext.length){
+      const rt=await sbFetch(`/rest/v1/taken?user_id=eq.${currentUser.id}`,{
+        method:'PATCH',body:JSON.stringify({data:tasks,updated_at:new Date().toISOString()})});
+      if(!rt.ok){const e=await rt.json();throw new Error(JSON.stringify(e));}
+    } else {
+      const rt=await sbFetch(`/rest/v1/taken`,{
+        method:'POST',body:JSON.stringify({user_id:currentUser.id,data:tasks,updated_at:new Date().toISOString()})});
+      if(!rt.ok){const e=await rt.json();throw new Error(JSON.stringify(e));}
+    }
+    // afspraken: check if row exists then PATCH or POST
+    const cha=await sbFetch(`/rest/v1/afspraken?user_id=eq.${currentUser.id}&select=id`);
+    const exa=await cha.json();
+    if(exa.length){
+      const ra=await sbFetch(`/rest/v1/afspraken?user_id=eq.${currentUser.id}`,{
+        method:'PATCH',body:JSON.stringify({data:afspraken,updated_at:new Date().toISOString()})});
+      if(!ra.ok){const e=await ra.json();throw new Error(JSON.stringify(e));}
+    } else {
+      const ra=await sbFetch(`/rest/v1/afspraken`,{
+        method:'POST',body:JSON.stringify({user_id:currentUser.id,data:afspraken,updated_at:new Date().toISOString()})});
+      if(!ra.ok){const e=await ra.json();throw new Error(JSON.stringify(e));}
+    }
     setSyncState('ok',currentUser.email.split('@')[0]);
-  }catch(e){setSyncState('err','Opslaan mislukt');}
+  }catch(e){console.error('saveData:',e);setSyncState('err','Opslaan mislukt');}
 }
 
 function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveData,800);}
